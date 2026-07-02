@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join - My chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page">
+    <div class="auth-box">
+        <h1>My Chat</h1>
+        <p>Sign in to start chatting.</p>
+
+        <!-- Two tabs button for login and register -->
+        <div class="tabs">
+            <button class="tab active" id="tab-login" onclick="showTab('login')">Login</button>
+            <button class="tab" id="tab-register" onclick="showTab('register')">Register</button>
+        </div>
+
+        <!-- Error Box -->
+         <div id="error-box" class="hidden"></div>
+
+         <!-- Login Form -->
+          <div id="login-form">
+            <input type="text" id="login-username" placeholder="Username" maxlength="20">
+            <input type="password" id="login-password" placeholder="Password">
+            <button onclick="login()">Login</button>
+          </div>
+
+          <!-- Register Form -->
+          <div id="register-form" class="hidden">
+            <input type="text" id="reg-username" placeholder="Username (min 3 chars)" minlength="3" maxlength="20">
+            <input type="password" id="reg-password" placeholder="Password (min 6 chars)" minlength="6">
+            <button onclick="register()">Create account</button>
+          </div>
+    </div>
+    <script src="auth.js"></script>
+</body>
+</html>
