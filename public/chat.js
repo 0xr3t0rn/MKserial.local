@@ -21,7 +21,7 @@ async function init() {
     socket = io();
 
     // Listen for incoming room messages
-    socket.on('new_messages', (msg) => {
+    socket.on('new_message', (msg) => {
         if (currentRoom) appendMessage(msg.username, msg.content, msg.created_at);
     });
 
@@ -85,8 +85,8 @@ async function createRoom() {
 }
 
 async function openRoom(roomId, roomName) {
-    const currentRoomId = roomId;
-    const currentDMUser = null;
+    currentRoom = roomId;
+    currentDM = null;
 
     socket.emit('join_room', roomId);
     
@@ -153,7 +153,7 @@ async function openDM(otherUsername) {
 }
 
 // Send Messages
-function sendMessages() {
+function sendMessage() {
     const input = document.getElementById('msg-input');
     const content = input.value.trim();
 
@@ -174,7 +174,9 @@ function appendMessage(username, content, time) {
     const div = document.createElement('div');
     div.classList.add('message');
 
-    const timeStr = new Date(time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit"});
+    // Time
+    const safeTime = time.includes('Z') ? time : time + 'Z';
+    const timeStr = new Date(safeTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit"});
 
     div.innerHTML = `
         <div>
@@ -193,7 +195,7 @@ function escapeHtml(text) {
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
-        .replace(/"/g, "&qout;")
+        .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
 
