@@ -1,126 +1,72 @@
-/* ============================================================
-   MY CHAT — 90s/2000s retro theme
-   ------------------------------------------------------------
-   Palette: black bg, lime green (links/primary), hot pink
-   (accents/errors), yellow (headings), blue (heading shadow).
-   Fonts: Times New Roman for headings, Verdana for body text,
-   Courier New for anything "typed" (inputs, timestamps).
-   ============================================================ */
-
-/* All colors and fonts live here as variables. Change a value
-   once here and it updates everywhere it's used below — this is
-   the only place you should ever need to touch to re-theme the
-   whole site. */
 :root {
-  --bg: #000000;
-  --fg: #e6e6e6;           /* default body text color */
-  --green: #55ff55;        /* links, primary accent */
-  --pink: #ff33cc;         /* hover states, errors, "your" messages */
-  --yellow: #ffff33;       /* headings, active states */
-  --blue: #4d79ff;         /* heading drop-shadow only */
-  --border: #666666;       /* standard thin borders */
-  --border-light: #999999; /* faded labels/icons */
-  --font-heading: "Times New Roman", Georgia, serif;
-  --font-body: Verdana, Arial, sans-serif;
-  --font-mono: "Courier New", Courier, monospace;
+  --bg: #fff4e0;        /* page background */
+  --panel: #ffffff;     /* content box background */
+  --maroon: #223f00;    /* title bars */
+  --maroon-dark: #082100;
+  --link: #0000ee;      /* unvisited link */
+  --visited: #551a8b;   /* visited link */
+  --text: #000000;
+  --text-dim: #666666;
+  --border: #d9c7b0;    /* box border */
+  --unread: #092600;
 }
 
-/* Reset: browsers add their own default margin/padding to body,
-   headings, etc. Zeroing it out means only OUR css controls
-   spacing, so nothing shifts unexpectedly. */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* Page background: solid black, plus two layers of
-   radial-gradient dots to fake the tiled "stars" background from
-   the reference image (no image file needed).
-   - Each radial-gradient draws ONE dot, then background-size
-     repeats it every 70px / 130px.
-   - Two layers at different sizes/offsets stop it from looking
-     like a perfect grid.
-   TO REMOVE THE DOTS: delete the two `background-image` lines
-   below (and the `background-size`/`background-position` lines
-   that go with them) and keep just `background-color: var(--bg);`
-   TO MAKE THEM FAINTER: lower the `.9` and `.6` opacity numbers. */
 body {
-  background-color: var(--bg);
-  color: var(--fg);
-  font-family: var(--font-body);
-  font-size: 15px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
   line-height: 1.5;
 }
 
-/* Used by auth.js/chat.js to show/hide elements (tabs, forms,
-   the create-room box). Kept as its own rule with !important so
-   it always wins, no matter what else targets the element. */
 .hidden {
   display: none !important;
 }
 
-/* Recreates the classic 3-state browser link behavior (unvisited
-   / visited / hover), just recolored to the theme palette. */
-a { color: var(--green); text-decoration: none; }
-a:visited { color: var(--blue); }
-a:hover { color: var(--pink); text-decoration: underline; }
-
-/* Text you highlight with your mouse turns pink instead of the
-   browser's default blue — small detail, easy to notice. */
-::selection {
-  background: var(--pink);
-  color: #000;
+a {
+  color: var(--link);
+  text-decoration: underline;
 }
-
-/* Custom scrollbar (Chrome/Edge/Safari only — Firefox will just
-   use its own default, that's fine, this isn't critical). */
-::-webkit-scrollbar { width: 12px; }
-::-webkit-scrollbar-track { background: #000; border-left: 1px solid var(--border); }
-::-webkit-scrollbar-thumb { background: var(--border); }
-::-webkit-scrollbar-thumb:hover { background: var(--green); }
+a:visited { color: var(--visited); }
+a:hover { color: var(--maroon); }
 
 /* ------------------------------------------------------------
-   SHARED FORM ELEMENTS
-   One rule for every <input> and <button> on the whole site
-   (both pages), so you never have to re-style a new field by
-   hand — it matches automatically.
+   shared inputs and buttons
    ------------------------------------------------------------ */
 input[type="text"],
 input[type="password"] {
-  font-family: var(--font-mono);
-  font-size: 1rem;
-  background: #000;
-  color: var(--green);
-  border: 1px solid var(--border);
-  padding: 0.5rem 0.6rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  background: #ffffff;
+  color: var(--text);
+  border: 1px solid #999999;
+  padding: 0.45rem 0.6rem;
   width: 100%;
 }
-input::placeholder { color: #888; }
-input:focus { outline: none; border-color: var(--pink); } /* pink border = "this field is active" */
-input:disabled { opacity: .4; }
+input:focus { outline: 1px solid var(--maroon); }
+input:disabled { opacity: .5; }
 
 button {
-  font-family: var(--font-body);
-  font-weight: bold;
-  font-size: .95rem;
-  background: var(--green);
-  color: #000;
-  border: 2px solid #000;
-  outline: 1px solid var(--border);
-  padding: 0.5rem 0.9rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  background: #eeeeee;
+  color: var(--text);
+  border: 1px solid #999999;
+  padding: 0.45rem 0.8rem;
   cursor: pointer;
 }
-button:hover { background: var(--yellow); }
-button:active { background: var(--pink); } /* the instant you click it */
-button:disabled { opacity: .4; cursor: not-allowed; background: var(--border); }
+button:hover { background: #e0d5c0; }
+button:disabled { opacity: .5; cursor: not-allowed; }
 
 /* ============================================================
-   AUTH PAGE (index.html — body class="auth-page")
+   AUTH PAGE
    ============================================================ */
-
-/* Centers the login card both horizontally and vertically,
-   no matter the window size. */
 body.auth-page {
   display: flex;
   align-items: center;
@@ -129,251 +75,192 @@ body.auth-page {
   padding: 1.5rem;
 }
 
-/* The login/register card itself. `border: 3px double` draws
-   two thin lines with a gap between — the old-school "photo
-   frame" border style used constantly on 90s sites. */
 .auth-box {
-  width: min(400px, 100%);
-  background: #000;
-  border: 3px double var(--green);
-  padding: 1.75rem;
-  text-align: center;
+  width: min(380px, 100%);
+  background: var(--panel);
+  border: 1px solid var(--border);
 }
 
-/* The "My Chat" title. The text-shadow is a flat, hard-edged
-   offset (no blur) — the cheapest possible way to fake the old
-   WordArt drop-shadow look. */
+/* title bar strip, styled like the maroon bars in the reference */
 .auth-box h1 {
-  font-family: var(--font-heading);
-  font-size: 2rem;
-  color: var(--yellow);
-  text-shadow: 2px 2px 0 var(--blue);
-  margin-bottom: .5rem;
+  background: var(--maroon);
+  color: #ffffff;
+  font-size: 1.1rem;
+  padding: 0.6rem 1rem;
 }
 
 .auth-box > p {
-  color: var(--fg);
-  margin-bottom: 1.25rem;
-  font-style: italic;
+  color: var(--text-dim);
+  padding: 0.75rem 1rem 0;
 }
 
-/* Login / Register tab buttons. Written after the generic
-   `button` rule above so it can override just the parts that
-   need to differ (flat background unless it's the active tab). */
 .tabs {
   display: flex;
-  gap: .5rem;
-  margin-bottom: 1rem;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem 0;
 }
 .tab {
   flex: 1;
-  background: #000;
-  color: var(--green);
-  border: 1px solid var(--border);
+  background: #eeeeee;
+  border: 1px solid #999999;
 }
-.tab.active { background: var(--green); color: #000; }
+.tab.active {
+  background: var(--maroon);
+  color: #ffffff;
+  border-color: var(--maroon-dark);
+}
 
-/* Error message box. `steps(1)` makes the animation jump
-   instantly between visible/invisible instead of fading — a
-   faithful recreation of the old <blink> tag, used here only,
-   not site-wide. */
 #error-box {
-  border: 1px solid var(--pink);
-  color: var(--pink);
-  font-family: var(--font-mono);
-  padding: .5rem;
-  margin-bottom: 1rem;
-  animation: blink 1s steps(1) infinite;
-}
-@keyframes blink {
-  50% { opacity: 0; }
+  margin: 0.75rem 1rem 0;
+  border: 1px solid var(--unread);
+  color: var(--unread);
+  padding: 0.5rem;
 }
 
 #login-form,
 #register-form {
   display: flex;
   flex-direction: column;
-  gap: .75rem;
-  text-align: left;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem 1rem;
 }
 
 /* ============================================================
-   CHAT PAGE (chat.html — body class="chat-page")
+   CHAT PAGE
    ============================================================ */
-
-/* Two-column layout: sidebar + chat area, side by side, filling
-   the full browser height. `overflow: hidden` on body stops the
-   whole PAGE from scrolling — only the parts inside that need to
-   scroll (message list, sidebar) will. */
 body.chat-page {
   display: flex;
   height: 100vh;
   overflow: hidden;
 }
 
-/* Fixed-width sidebar. `flex-shrink: 0` stops it from getting
-   squeezed smaller when the chat area needs more room. */
 .sidebar {
-  width: 240px;
+  width: 230px;
   flex-shrink: 0;
-  border-right: 2px solid var(--border);
-  padding: 1rem;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
 }
 
 .sidebar-top {
+  background: var(--maroon);
+  color: #ffffff;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: .6rem;
-  margin-bottom: .75rem;
+  padding: 0.6rem 0.8rem;
 }
-.sidebar-top span { font-family: var(--font-heading); font-weight: bold; color: var(--pink); font-size: 1.1rem; }
-.sidebar-top button { padding: .3rem .6rem; font-size: .8rem; }
+.sidebar-top span { font-weight: bold; }
+.sidebar-top button {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+  background: #ffffff;
+  border-color: var(--maroon-dark);
+}
 
-/* Shows the logged-in username. The "USER: " label is added
-   purely by CSS (::before), so your JS only has to set the
-   username text, not the label. */
 #my-username {
-  color: var(--green);
-  font-family: var(--font-mono);
-  margin-bottom: 1rem;
-}
-#my-username::before {
-  content: "USER: ";
-  color: var(--border-light);
+  padding: 0.6rem 0.8rem 0;
+  color: var(--text-dim);
 }
 
-/* "ROOMS" / "DIRECT MESSAGE" section labels. */
 .sidebar h4 {
-  color: var(--yellow);
-  font-size: .8rem;
-  letter-spacing: .1em;
-  margin: 1rem 0 .4rem;
-  border-bottom: 1px dashed var(--border);
-  padding-bottom: .25rem;
+  color: var(--maroon);
+  font-size: 0.8rem;
+  padding: 0.8rem 0.8rem 0.3rem;
+  border-bottom: 1px solid var(--border);
+  margin: 0 0.8rem;
 }
 
 .sidebar > button {
-  width: 100%;
+  margin: 0.5rem 0.8rem 0;
   text-align: left;
-  margin-bottom: .5rem;
-  font-size: .85rem;
 }
 
 #create-room-box {
   display: flex;
-  gap: .4rem;
-  margin-bottom: .5rem;
+  gap: 0.4rem;
+  padding: 0 0.8rem;
+  margin-top: 0.5rem;
 }
 #create-room-box input { flex: 1; }
 
-/* Room and DM lists. The "#" and "@" prefixes are added by CSS
-   (::before) so your JavaScript just needs to insert the plain
-   room/user name into each <li> — no string concatenation needed
-   on your end. */
 #room-list,
 #user-list {
   list-style: none;
-  margin-bottom: .5rem;
+  padding: 0.3rem 0.8rem 0.6rem;
 }
 #room-list li,
 #user-list li {
-  padding: .35rem .3rem;
+  padding: 0.3rem 0;
+  color: var(--link);
   cursor: pointer;
-  color: var(--fg);
+  text-decoration: underline;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-#room-list li::before { content: "# "; color: var(--border-light); }
-#user-list li::before { content: "@ "; color: var(--border-light); }
 #room-list li:hover,
-#user-list li:hover {
-  color: var(--pink);
-  text-decoration: underline;
-}
-/* Your JS should add/remove these two classes on the <li>: */
+#user-list li:hover { color: var(--maroon); }
 #room-list li.active,
-#user-list li.active {
-  color: var(--yellow);   /* the room/DM currently open */
-  font-weight: bold;
-}
+#user-list li.active { color: var(--maroon); font-weight: bold; }
 #room-list li.unread,
-#user-list li.unread {
-  color: var(--pink);     /* has new messages you haven't seen */
-  font-weight: bold;
-}
+#user-list li.unread { color: var(--unread); font-weight: bold; }
 
-/* Right-hand side: header + messages + input, stacked vertically,
-   filling all remaining width next to the sidebar. */
 .chat-area {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-width: 0; /* lets long room names truncate instead of overflowing */
+  min-width: 0;
 }
 
 .chat-header {
-  border-bottom: 2px solid var(--border);
-  padding: .75rem 1.25rem;
+  background: var(--maroon);
+  color: #ffffff;
+  padding: 0.6rem 1rem;
 }
-#chat-title {
-  font-family: var(--font-heading);
-  font-weight: bold;
-  color: var(--yellow);
-  font-size: 1.2rem;
-}
+#chat-title { font-weight: bold; }
 
-/* Scrollable message log. `flex: 1` makes it eat all the leftover
-   vertical space between the header and the input row. */
 #messages {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: .4rem;
+  padding: 1rem;
+  background: var(--panel);
 }
 
-/* Expected structure for each message, built by chat.js:
+/* expected structure built by chat.js:
    <div class="message">
      <span class="message-author">alice</span>
      <span class="message-content">hey!</span>
      <span class="message-time">21:04</span>
    </div>
-   Add class="message own" for messages YOU sent, and
-   class="message system" (author/time spans not required) for
-   join/leave notices. If your chat.js already names things
-   differently, rename them there, or send me chat.js and I'll
-   match this file to it exactly. */
-.message { font-size: .95rem; }
-.message .message-author { color: var(--green); font-weight: bold; margin-right: .4rem; }
-.message.own .message-author { color: var(--pink); } /* your own name stands out */
-.message .message-time { color: var(--border-light); font-family: var(--font-mono); font-size: .75rem; margin-left: .4rem; }
-.message.system { color: var(--border-light); font-style: italic; font-size: .85rem; }
-.message.system::before { content: "* "; }
+   add class="message own" for your own messages, and
+   class="message system" for join/leave notices. */
+.message { padding: 0.2rem 0; }
+.message .message-author { color: var(--maroon); font-weight: bold; margin-right: 0.4rem; }
+.message.own .message-author { color: var(--link); }
+.message .message-time { color: var(--text-dim); font-size: 0.75rem; margin-left: 0.4rem; }
+.message.system { color: var(--text-dim); font-style: italic; font-size: 0.85rem; }
 
 .input-row {
   display: flex;
-  gap: .5rem;
-  border-top: 2px solid var(--border);
-  padding: .75rem 1.25rem;
+  gap: 0.5rem;
+  border-top: 1px solid var(--border);
+  padding: 0.6rem 1rem;
+  background: var(--panel);
 }
 #msg-input { flex: 1; }
 
 /* ------------------------------------------------------------
-   MOBILE LAYOUT
-   Below 700px wide, stack the sidebar on top of the chat area
-   instead of side-by-side, and cap its height so the chat still
-   gets most of the screen. */
+   mobile
+   ------------------------------------------------------------ */
 @media (max-width: 700px) {
   body.chat-page { flex-direction: column; }
   .sidebar {
     width: 100%;
     max-height: 35vh;
     border-right: none;
-    border-bottom: 2px solid var(--border);
+    border-bottom: 1px solid var(--border);
   }
 }
