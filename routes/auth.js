@@ -11,7 +11,7 @@ const SECRET = process.env.JWT_SECRET;
 
 // Helper function to create token and set it as cookie
 function issueToken(res, user) {
-    jwt.sign(
+    const token = jwt.sign(
         { id: user.id, username: user.username },
         SECRET,
         { expiresIn: "7d" }
