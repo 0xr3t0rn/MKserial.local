@@ -1,5 +1,6 @@
 node_modules/
 .env
-chat.dbchat.db
+chat.db
 chat.db-wal
 chat.db-shm
+db/
