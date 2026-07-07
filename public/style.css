@@ -1,14 +1,14 @@
 :root {
   --bg: #fff4e0;        /* page background */
   --panel: #ffffff;     /* content box background */
-  --maroon: #223f00;    /* title bars */
-  --maroon-dark: #082100;
+  --maroon: #800080;    /* title bars */
+  --maroon-dark: #54005f;
   --link: #0000ee;      /* unvisited link */
   --visited: #551a8b;   /* visited link */
   --text: #000000;
   --text-dim: #666666;
   --border: #d9c7b0;    /* box border */
-  --unread: #092600;
+  --unread: #200026;
 }
 
 * {
