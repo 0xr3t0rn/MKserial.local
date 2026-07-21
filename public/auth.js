@@ -7,6 +7,54 @@
   } catch (_) {}
   // catch ignores errors — a 401 just means "not logged in," which is fine here
 })();
+// Main page
+function showLogin() {
+    document.querySelector(".auth-box").classList.remove("hidden");
+    showTab("login");
+}
+
+function showRegister() {
+    document.querySelector(".auth-box").classList.remove("hidden");
+    showTab("register");
+}
+
+function closeAuth() {
+    document.querySelector(".auth-box").classList.add("hidden");
+}
+
+// Auth page dragging
+const authBox = document.getElementById("auth-box");
+const header = document.getElementById("auth-header");
+
+let isDragging = false;
+let offsetX = 0;
+let offsetY = 0;
+
+header.addEventListener("mousedown", (e) => {
+    isDragging = true;
+
+    const rect = authBox.getBoundingClientRect();
+
+    authBox.style.left = rect.left + "px";
+    authBox.style.top = rect.top + "px";
+    authBox.style.transform = "none";
+
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+});
+
+document.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
+
+    authBox.style.left = (e.clientX - offsetX) + "px";
+    authBox.style.top = (e.clientY - offsetY) + "px";
+
+    authBox.style.transform = "none";
+});
+
+document.addEventListener("mouseup", () => {
+    isDragging = false;
+});
 
 // Tab switching
 function showTab(tab) {

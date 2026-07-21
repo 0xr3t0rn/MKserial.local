@@ -7,8 +7,25 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="auth-page">
-    <div class="auth-box">
-        <h1>MKserial.local</h1>
+
+    <div class="main-page">
+        <header class="main-header">
+            <div class="logo">
+                <h1 style="color: #ffeadb">MKserial.local</h1>
+                <p>No system is safe</p>
+            </div>
+
+            <div class="nav">
+                <button onclick="showLogin()">Login</button>
+                <button onclick="showRegister()">Create Account</button>
+            </div>
+        </header>
+    </div>
+    <div class="auth-box hidden" id="auth-box">
+
+        <button class="close-auth" onclick="closeAuth()">&times;</button>
+
+        <h1 id="auth-header">MKserial.local</h1>
 
         <!-- Two tabs button for login and register -->
         <div class="tabs">

@@ -36,9 +36,10 @@ a {
 a:visited { color: var(--visited); }
 a:hover { color: var(--maroon); }
 
-/* ------------------------------------------------------------
+/*
    shared inputs and buttons
-   ------------------------------------------------------------ */
+*/
+
 input[type="text"],
 input[type="password"] {
   font-family: Arial, Helvetica, sans-serif;
@@ -64,15 +65,115 @@ button {
 button:hover { background: #e0d5c0; }
 button:disabled { opacity: .5; cursor: not-allowed; }
 
-/* ============================================================
+/*
+   MAIN PAGE
+*/
+.main-page {
+    width: 100%;
+    min-height: 100vh;
+}
+
+.main-header {
+    background-color: #800080;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 20px 40px;
+}
+
+.logo {
+    display: flex;
+    flex-direction: column;
+}
+
+.logo h1 {
+    margin: 0;
+    line-height: 1;
+}
+
+.logo p {
+    margin: 0;
+    margin-top: 2px;
+    color: #ffeadbb1;
+    font-size: 14px;
+    font-family: sans-serif;
+}
+
+
+/*
+   AUTH PAGE POPUP
+*/
+.auth-box {
+    position: fixed;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    width: min(380px, 100%);
+
+    background: var(--panel);
+    border: 1px solid var(--border);
+
+    z-index: 100;
+}
+
+.auth-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    z-index: 100;
+
+    /* Add this */
+    position: fixed;
+}
+
+.close-auth {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+
+    width: 30px;
+    height: 30px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border: none;
+    background: transparent;
+    color: white;
+
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1;
+
+    cursor: pointer;
+
+    padding: 0;
+}
+
+.close-auth:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+}
+
+/*
    AUTH PAGE
-   ============================================================ */
+*/
+#auth-header {
+    cursor: move;
+    user-select: none;
+}
+
 body.auth-page {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   min-height: 100vh;
-  padding: 1.5rem;
+  background: var(--bg);
+  position: relative;
 }
 
 .auth-box {
@@ -125,9 +226,9 @@ body.auth-page {
   padding: 0.75rem 1rem 1rem;
 }
 
-/* ============================================================
+/*
    CHAT PAGE
-   ============================================================ */
+*/
 body.chat-page {
   display: flex;
   height: 100vh;
