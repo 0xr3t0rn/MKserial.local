@@ -9,7 +9,9 @@ const db = require('./db/database');
 const authRouter = require('./routes/auth');
 const chatRouter = require('./routes/chat');
 
+const helmet = require('helmet');
 const app = express();
+app.set('trust proxy', 1);
 const server = http.createServer(app);
 const io = new Server(server);
 
@@ -17,9 +19,10 @@ const PORT = process.env.PORT || 3000;
 const SECRET = process.env.JWT_SECRET;
 
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
 app.use(express.static('public'));
+app.use(helmet());
 
 // Http Routes
 app.use('/api', authRouter);

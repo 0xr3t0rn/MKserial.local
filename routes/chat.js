@@ -22,6 +22,14 @@ function requireLogin(req, res, next) {
     };
 }
 
+// Room creation limiter
+const createRoomLimiter = rateLimit({
+    windowMs: 10 * 60 * 1000,
+    max: 10,
+    keyGenerator: (req) => req.user?.id?.toString() || req.ip,
+    message: { error: "Too many rooms created, please slow down" }
+});
+
 // GET /api/rooms
 router.get('/rooms', requireLogin, (req, res) => {
     const rooms = db
@@ -35,7 +43,7 @@ router.post('/rooms', requireLogin, (req, res) => {
     let name = req.body.name?.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 
     if(!name || name.length < 2) {
-        res.status(400).json({ error: "Room name must be at least 2 characters" });
+        return res.status(400).json({ error: "Room name must be at least 2 characters" });
     };
     
     try {

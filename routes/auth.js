@@ -6,8 +6,16 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../db/database');
 const router = express.Router();
-
 const SECRET = process.env.JWT_SECRET;
+const rateLimit = require('express-rate-limit');
+
+// Rate Limiter
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 20,
+    keygenerator: (req) => req.body.username || req.ip,
+    message: { error: "Too many attempts, please try again later" }
+});
 
 // Helper function to create token and set it as cookie
 function issueToken(res, user) {
@@ -19,12 +27,13 @@ function issueToken(res, user) {
 
     res.cookie('token', token, {
         httpOnly: true,
-        maxAge: 7 * 24 * 60 * 60 * 1000
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        samesite: 'lax',
     });
 }
 
 // POST /api/register
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
     const { username, password } = req.body;
 
     if(!username || !password){
@@ -35,6 +44,12 @@ router.post('/register', async (req, res) => {
     };
     if(password.length < 6){
         return res.status(400).json({ error: "Password length must greater than 6" });
+    };
+    if(password.length > 72){
+    return res.status(400).json({ error: "Password must be 72 characters or fewer" });
+    };
+    if(!/^[a-zA-Z0-9_-]{3,20}$/.test(username)){
+    return res.status(400).json({ error: "Username must be 3-20 characters (letters, numbers, _ or - only)" });
     };
 
     // Password hashing
@@ -58,7 +73,7 @@ router.post('/register', async (req, res) => {
 });
 
 // POST /api/login
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
 
     const { username, password } = req.body;
     if(!username || !password) {
