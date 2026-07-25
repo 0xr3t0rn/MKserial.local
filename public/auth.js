@@ -7,6 +7,7 @@
   } catch (_) {}
   // catch ignores errors — a 401 just means "not logged in," which is fine here
 })();
+
 // Main page
 function showLogin() {
     document.querySelector(".auth-box").classList.remove("hidden");
@@ -55,6 +56,34 @@ document.addEventListener("mousemove", (e) => {
 document.addEventListener("mouseup", () => {
     isDragging = false;
 });
+
+// Rotating tagline
+const taglines = [
+  "No system is safe.",
+  "Don't trust the government!",
+  "Stay paranoid.",
+  "They're always watching.",
+  "They're always listening.",
+  "Privacy is not a crime.",
+  "Bless all form of intelligence."
+];
+
+const taglineEl = document.getElementById("tagline");
+
+// pick a random one immediately, so every refresh/visit starts on a
+// different tagline instead of always the same first one
+let taglineIndex = Math.floor(Math.random() * taglines.length);
+taglineEl.textContent = taglines[taglineIndex];
+
+setInterval(() => {
+  taglineEl.style.opacity = 0;
+
+  setTimeout(() => {
+    taglineIndex = (taglineIndex + 1) % taglines.length;
+    taglineEl.textContent = taglines[taglineIndex];
+    taglineEl.style.opacity = 1;
+  }, 500);
+}, 6000); // seconds
 
 // Tab switching
 function showTab(tab) {
@@ -135,5 +164,5 @@ document.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter') return;
 
     const loginVisible = !document.getElementById('login-form').classList.contains('hidden');
-    loginVisible ? login(): register;
+    loginVisible ? login(): register();
 });

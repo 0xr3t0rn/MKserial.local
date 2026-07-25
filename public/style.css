@@ -81,7 +81,16 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 
     padding: 20px 40px;
 }
+  /* Tagline on the main page */
+#tagline {
+    transition: opacity 0.5s ease;
+}
 
+.logo-mark {
+    display: block;
+    height: 2.2rem;
+    width: auto;
+}
 .logo {
     display: flex;
     flex-direction: column;
