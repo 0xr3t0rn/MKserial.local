@@ -65,7 +65,13 @@ const taglines = [
   "They're always watching.",
   "They're always listening.",
   "Privacy is not a crime.",
-  "Bless all form of intelligence."
+  "Bless all form of intelligence.",
+  "You can help the poor without being a communist.",
+  "Communism is just as bad as Capitalism.",
+  "F*CK SOCIETY.",
+  "Stay hidden.",
+  "Down with Big Brother!",
+  "The first rule of Fight Club is: you do not talk about Fight Club."
 ];
 
 const taglineEl = document.getElementById("tagline");
@@ -75,7 +81,7 @@ const taglineEl = document.getElementById("tagline");
 let taglineIndex = Math.floor(Math.random() * taglines.length);
 taglineEl.textContent = taglines[taglineIndex];
 
-setInterval(() => {
+function nextTagline() {
   taglineEl.style.opacity = 0;
 
   setTimeout(() => {
@@ -83,7 +89,11 @@ setInterval(() => {
     taglineEl.textContent = taglines[taglineIndex];
     taglineEl.style.opacity = 1;
   }, 500);
-}, 6000); // seconds
+}
+
+setInterval(nextTagline, 10000);
+
+taglineEl.addEventListener("click", nextTagline);
 
 // Tab switching
 function showTab(tab) {
@@ -140,11 +150,16 @@ async function register() {
 
     const username = document.getElementById('reg-username').value.trim();
     const password = document.getElementById('reg-password').value;
+    const confirmPassword = document.getElementById('reg-confirm-password').value;
 
     if (!username || !password) {
         return showError("Please fill in all fields");
     };
 
+    if (password !== confirmPassword) {
+        return showError("Passwords not matched")
+    };
+    
     const res = await fetch('/api/register', {
         method: "POST",
         headers: { "Content-Type": "application/json" },

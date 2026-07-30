@@ -89,7 +89,7 @@ async function openRoom(roomId, roomName) {
     currentDM = null;
 
     socket.emit('join_room', roomId);
-    
+
     document.getElementById('chat-title').textContent = "# " + roomName;
     document.getElementById('messages').innerHTML = "";
 
@@ -176,7 +176,10 @@ function appendMessage(username, content, time) {
 
     // Time
     const safeTime = time.includes('Z') ? time : time + 'Z';
-    const timeStr = new Date(safeTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit"});
+    const dateObj = new Date(safeTime);
+    const datePart = dateObj.toLocaleDateString([], { month: "short", day: "numeric" }); // e.g. "Jul 27"
+    const timePart = dateObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); // e.g. "21:04"
+    const timeStr = `${datePart}, ${timePart}`; // e.g. "Jul 27, 21:04"
 
     div.innerHTML = `
         <div>
@@ -185,7 +188,7 @@ function appendMessage(username, content, time) {
         </div>
         <div class="msg-text">${escapeHtml(content)}</div>
         `;
-    
+
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
 }
@@ -200,29 +203,29 @@ function escapeHtml(text) {
 }
 
 function highlightItem(listId, id, username) {
-  document.querySelectorAll(`#${listId} li`).forEach(li => {
-    let match = false;
-    if (id)       match = li.dataset.id == id;
-    if (username) match = li.textContent.includes(username);
-    li.classList.toggle("active", match);
-  });
+    document.querySelectorAll(`#${listId} li`).forEach(li => {
+        let match = false;
+        if (id) match = li.dataset.id == id;
+        if (username) match = li.textContent.includes(username);
+        li.classList.toggle("active", match);
+    });
 }
 
 function clearHighlight(listId) {
-  document.querySelectorAll(`#${listId} li`).forEach(li => li.classList.remove("active"));
+    document.querySelectorAll(`#${listId} li`).forEach(li => li.classList.remove("active"));
 }
 
 
 // Logout
 async function logout() {
-  await fetch("/api/logout", { method: "POST" });
-  window.location.href = "/";
+    await fetch("/api/logout", { method: "POST" });
+    window.location.href = "/";
 }
 
 
 // Keyboard Shortcut
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") sendMessage();
+    if (e.key === "Enter") sendMessage();
 });
 
 

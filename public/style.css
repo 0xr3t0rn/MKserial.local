@@ -83,7 +83,8 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 }
   /* Tagline on the main page */
 #tagline {
-    transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease;
+  cursor: pointer;
 }
 
 .logo-mark {
@@ -361,6 +362,18 @@ body.chat-page {
   background: var(--panel);
 }
 #msg-input { flex: 1; }
+
+.msg-user {
+  font-weight: bold;
+  color: var(--maroon);
+  margin-right: 0.4rem;
+}
+
+.msg-time {
+  font-size: 0.7rem;
+  opacity: 0.6;
+  color: var(--text-dim);
+}
 
 /* ------------------------------------------------------------
    mobile
