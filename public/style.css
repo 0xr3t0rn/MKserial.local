@@ -375,6 +375,37 @@ body.chat-page {
   color: var(--text-dim);
 }
 
+#passcode-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+.passcode-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  width: min(340px, 90%);
+  padding: 1.25rem;
+}
+.passcode-box p {
+  margin-bottom: 0.75rem;
+  color: var(--text-dim);
+}
+#passcode-error {
+  color: var(--unread);
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
+}
+.passcode-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.passcode-actions button { flex: 1; }
+
 /* ------------------------------------------------------------
    mobile
    ------------------------------------------------------------ */

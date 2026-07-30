@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Chat</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body class="chat-page">
     <aside class="sidebar">
         <div class="sidebar-top">
@@ -39,11 +41,24 @@
         <div id="messages"></div> <!-- Messages get added here by Javascript -->
 
         <div class="input-row">
-            <input type="text" id="msg-input" placeholder="Type a message..." disabled >
-            <button id="send-btn" onclick="sendMessage()" disabled >Send</button>
+            <input type="text" id="msg-input" placeholder="Type a message..." disabled>
+            <button id="send-btn" onclick="sendMessage()" disabled>Send</button>
         </div>
     </main>
+
+    <div id="passcode-modal" class="hidden">
+        <div class="passcode-box">
+            <p id="passcode-hint">This room is protected. Enter the passcode to continue.</p>
+            <input type="password" id="passcode-input" placeholder="Passcode">
+            <div id="passcode-error" class="hidden"></div>
+            <div class="passcode-actions">
+                <button onclick="submitPasscode()">Unlock</button>
+                <button onclick="closePasscodeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="chat.js"></script>
 </body>
+
 </html>

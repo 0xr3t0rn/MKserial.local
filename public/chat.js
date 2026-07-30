@@ -3,6 +3,9 @@ let myUsername = null;
 let currentRoom = null;
 let currentDM = null;
 let socket = null;
+let currentRoomToken = null;
+let pendingRoom = null;
+window.roomsById = {};
 
 async function init() {
     // Check if logged in
@@ -40,18 +43,22 @@ async function loadRooms() {
     const res = await fetch('/api/rooms');
     const rooms = await res.json();
 
+    window.roomsById = {};
+
     const list = document.getElementById('room-list');
     list.innerHTML = "";
 
     rooms.forEach(room => {
+        window.roomsById[room.id] = room;
+
         const li = document.createElement('li');
-        li.textContent = "# " + room.name;
+        li.textContent = "# " + room.name + (room.has_passcode ? " 🔒" : "");
         li.dataset.id = room.id;
-        li.onclick = () => openRoom(room.id, room.name);
+        li.onclick = () => tryOpenRoom(room.id, room.name);
         list.appendChild(li);
     });
 
-    if (rooms.length > 0) openRoom(rooms[0].id, rooms[0].name);
+    if (rooms.length > 0) tryOpenRoom(rooms[0].id, rooms[0].name);
 }
 
 function showCreateRoom() {
@@ -60,6 +67,18 @@ function showCreateRoom() {
     if (!box.classList.contains('hidden')) {
         document.getElementById('room-name-input').focus();
     }
+}
+
+function tryOpenRoom(roomId, roomName) {
+    const room = window.roomsById[roomId];
+    const cachedToken = sessionStorage.getItem(`roomToken:${roomId}`);
+
+    if (room?.has_passcode && !cachedToken) {
+        showPasscodeModal(room, roomName);
+        return;
+    }
+
+    openRoom(roomId, roomName, cachedToken);
 }
 
 async function createRoom() {
@@ -84,11 +103,12 @@ async function createRoom() {
     openRoom(data.id, data.name);
 }
 
-async function openRoom(roomId, roomName) {
+async function openRoom(roomId, roomName, roomToken) {
     currentRoom = roomId;
     currentDM = null;
+    currentRoomToken = roomToken || null;
 
-    socket.emit('join_room', roomId);
+    socket.emit('join_room', { roomId, roomToken: currentRoomToken });
 
     document.getElementById('chat-title').textContent = "# " + roomName;
     document.getElementById('messages').innerHTML = "";
@@ -96,17 +116,15 @@ async function openRoom(roomId, roomName) {
     highlightItem('room-list', roomId);
     clearHighlight('user-list');
 
-    // Enable Input
     const input = document.getElementById('msg-input');
     const btn = document.getElementById('send-btn');
-
     input.disabled = false;
     btn.disabled = false;
     input.placeholder = "Message #" + roomName;
     input.focus();
 
-    // Load message history via HTTP not Websocket (history is a one-time fetch)
-    const res = await fetch(`/api/rooms/${roomId}/messages`);
+    const headers = currentRoomToken ? { 'x-room-token': currentRoomToken } : {};
+    const res = await fetch(`/api/rooms/${roomId}/messages`, { headers });
     const messages = await res.json();
     messages.forEach(m => appendMessage(m.username, m.content, m.created_at));
 }
@@ -156,11 +174,10 @@ async function openDM(otherUsername) {
 function sendMessage() {
     const input = document.getElementById('msg-input');
     const content = input.value.trim();
-
     if (!content) return;
 
     if (currentRoom) {
-        socket.emit('send_message', { roomId: currentRoom, content });
+        socket.emit('send_message', { roomId: currentRoom, content, roomToken: currentRoomToken });
     } else if (currentDM) {
         socket.emit('send_dm', { otherUsername: currentDM, content });
     }
@@ -214,7 +231,47 @@ function highlightItem(listId, id, username) {
 function clearHighlight(listId) {
     document.querySelectorAll(`#${listId} li`).forEach(li => li.classList.remove("active"));
 }
+// Modal logic
+function showPasscodeModal(room, roomName) {
+    pendingRoom = { id: room.id, name: roomName };
+    document.getElementById('passcode-hint').textContent =
+        room.hint || "This room is protected. Enter the passcode to continue.";
+    document.getElementById('passcode-input').value = "";
+    document.getElementById('passcode-error').classList.add('hidden');
+    document.getElementById('passcode-modal').classList.remove('hidden');
+    document.getElementById('passcode-input').focus();
+}
 
+function closePasscodeModal() {
+    document.getElementById('passcode-modal').classList.add('hidden');
+    pendingRoom = null;
+}
+
+async function submitPasscode() {
+    const passcode = document.getElementById('passcode-input').value;
+    if (!passcode || !pendingRoom) return;
+
+    const res = await fetch(`/api/rooms/${pendingRoom.id}/unlock`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passcode })
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+        document.getElementById('passcode-error').textContent = data.error || "Incorrect passcode";
+        document.getElementById('passcode-error').classList.remove('hidden');
+        return;
+    }
+
+    if (data.roomToken) {
+        sessionStorage.setItem(`roomToken:${pendingRoom.id}`, data.roomToken);
+    }
+
+    const room = pendingRoom;
+    closePasscodeModal();
+    openRoom(room.id, room.name, data.roomToken);
+}
 
 // Logout
 async function logout() {
@@ -225,7 +282,9 @@ async function logout() {
 
 // Keyboard Shortcut
 document.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") sendMessage();
+    if (e.key !== "Enter") return;
+    const modalOpen = !document.getElementById('passcode-modal').classList.contains('hidden');
+    modalOpen ? submitPasscode() : sendMessage();
 });
 
 

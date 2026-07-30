@@ -52,17 +52,50 @@ io.on('connection', (socket) => {
   console.log(`${socket.user.username} connected`);
 
   // Event: client joins a chat room
-  socket.on('join_room', (roomId) => {
-    if (socket.currentRoom) socket.leave(socket.currentRoom);
+  socket.on('join_room', ({ roomId, roomToken }) => {
+    roomId = Number(roomId);
+    if (!Number.isInteger(roomId) || roomId <= 0) return;
 
+    const room = db.prepare('SELECT passcode_hash FROM rooms WHERE id = ?').get(roomId);
+    if (!room) return;
+
+    // NEW: same passcode check as the HTTP route, so locked rooms
+    // can't be joined over the socket without a valid token either
+    if (room.passcode_hash) {
+        if (!roomToken) return;
+        try {
+            const payload = jwt.verify(roomToken, SECRET);
+            if (payload.roomId !== roomId || payload.uid !== socket.user.id) return;
+        } catch {
+            return;
+        }
+    }
+
+    if (socket.currentRoom) socket.leave(socket.currentRoom);
     socket.join("room-" + roomId);
     socket.currentRoom = "room-" + roomId;
     socket.currentDM = null;
   });
 
   // Event: client sends a room message
-  socket.on('send_message', ({ roomId, content }) => {
+  socket.on('send_message', ({ roomId, content, roomToken }) => {
     if (!content?.trim() || !roomId) return;
+    roomId = Number(roomId);
+
+    // NEW: re-check the lock here too — without this, someone could
+    // send messages into a locked room without ever unlocking it,
+    // just by calling send_message directly
+    const room = db.prepare('SELECT passcode_hash FROM rooms WHERE id = ?').get(roomId);
+    if (!room) return;
+    if (room.passcode_hash) {
+        if (!roomToken) return;
+        try {
+            const payload = jwt.verify(roomToken, SECRET);
+            if (payload.roomId !== roomId || payload.uid !== socket.user.id) return;
+        } catch {
+            return;
+        }
+    }
 
     const text = content.trim().slice(0, 2000);
 
