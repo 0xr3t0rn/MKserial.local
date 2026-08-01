@@ -10,6 +10,7 @@ const router = express.Router();
 const SECRET = process.env.JWT_SECRET;
 
 const bcrypt = require('bcrypt');
+const { ipKeyGenerator } = rateLimit;
 
 function requireLogin(req, res, next) {
     const token = req.cookies.token;
@@ -29,7 +30,7 @@ function requireLogin(req, res, next) {
 const createRoomLimiter = rateLimit({
     windowMs: 10 * 60 * 1000,
     max: 10,
-    keyGenerator: (req) => req.user?.id?.toString() || req.ip,
+    keyGenerator: (req) => req.user?.id?.toString() || ipKeyGenerator(req),
     message: { error: "Too many rooms created, please slow down" }
 });
 
@@ -172,4 +173,30 @@ router.post('/rooms/:roomId/unlock', requireLogin, async (req, res) => {
 
     res.json({ success: true, roomToken });
 });
+
+// GET /api/stats — public site stats for the landing page terminal box
+// NOTE: intentionally has no requireLogin — this needs to work
+// before someone's logged in, on the main page itself.
+router.get('/stats', (req, res) => {
+    const users = db.prepare('SELECT COUNT(*) AS c FROM users').get().c;
+    const rooms = db.prepare('SELECT COUNT(*) AS c FROM rooms').get().c;
+    const roomMsgs = db.prepare('SELECT COUNT(*) AS c FROM messages').get().c;
+    const dmMsgs = db.prepare('SELECT COUNT(*) AS c FROM direct_messages').get().c;
+    const visits = db.prepare("SELECT value FROM site_stats WHERE key = 'visits'").get()?.value || 0;
+
+    res.json({
+        users,
+        rooms,
+        messages: roomMsgs + dmMsgs,
+        visits
+    });
+});
+
+// POST /api/visit — bumps the visit counter by 1, called once per page load
+router.post('/visit', (req, res) => {
+    db.prepare("UPDATE site_stats SET value = value + 1 WHERE key = 'visits'").run();
+    const visits = db.prepare("SELECT value FROM site_stats WHERE key = 'visits'").get().value;
+    res.json({ visits });
+});
+
 module.exports = router;

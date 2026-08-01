@@ -7,13 +7,14 @@ const jwt = require('jsonwebtoken');
 const db = require('../db/database');
 const router = express.Router();
 const SECRET = process.env.JWT_SECRET;
-const rateLimit = require('express-rate-limit');
+const rateLimit = require('express-rate-limit');    
+const { ipKeyGenerator } = rateLimit;
 
 // Rate Limiter
 const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
+    windowMs: 15 * 60 * 1000,
     max: 20,
-    keygenerator: (req) => req.body.username || req.ip,
+    keyGenerator: (req) => req.body.username || ipKeyGenerator(req), // fixed casing + IPv6-safe helper
     message: { error: "Too many attempts, please try again later" }
 });
 

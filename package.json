@@ -23,5 +23,10 @@
   },
   "description": "test (local) chat app",
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "allowScripts": {
+    "better-sqlite3@9.6.0": true,
+    "bcrypt@5.1.1": true,
+    "sqlite3@6.0.1": true
+  }
 }

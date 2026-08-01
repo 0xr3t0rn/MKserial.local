@@ -95,6 +95,52 @@ setInterval(nextTagline, 10000);
 
 taglineEl.addEventListener("click", nextTagline);
 
+// Main page
+// Terminal boot log + live stats
+const bootLines = [
+  "> initializing secure connection...",
+];
+
+async function typeLine(container, text) {
+  const p = document.createElement("p");
+  p.classList.add("cursor");
+  container.appendChild(p);
+
+  for (let i = 0; i < text.length; i++) {
+    p.textContent = text.slice(0, i + 1);
+    await new Promise(r => setTimeout(r, 20));
+  }
+  p.classList.remove("cursor");
+}
+
+async function runBootSequence() {
+  const log = document.getElementById("terminal-log");
+  for (const line of bootLines) {
+    await typeLine(log, line);
+    await new Promise(r => setTimeout(r, 300));
+  }
+  loadStats();
+}
+
+async function loadStats() {
+  try {
+    await fetch("/api/visit", { method: "POST" }); // counts this page load
+    const res = await fetch("/api/stats");
+    const data = await res.json();
+
+    document.getElementById("stat-users").textContent = data.users;
+    document.getElementById("stat-rooms").textContent = data.rooms;
+    document.getElementById("stat-messages").textContent = data.messages.toLocaleString();
+    document.getElementById("stat-visits").textContent = String(data.visits).padStart(6, "0");
+
+    document.getElementById("terminal-stats").classList.remove("hidden");
+  } catch (_) {
+    // stats are decorative — fail silently if the server hiccups
+  }
+}
+
+runBootSequence();
+
 // Tab switching
 function showTab(tab) {
     const isLogin = tab === 'login';

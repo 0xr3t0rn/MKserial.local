@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join - MKserial.local</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body class="auth-page">
 
     <div class="main-page">
@@ -20,6 +22,20 @@
                 <button onclick="showRegister()">Create Account</button>
             </div>
         </header>
+        <div class="terminal-panel">
+            <pre class="ascii-banner">╔══════════════════════════════╗
+║       MKSERIAL.LOCAL         ║
+╚══════════════════════════════╝</pre>
+
+            <div id="terminal-log"></div>
+
+            <div id="terminal-stats" class="hidden">
+                <p>&gt; USERS REGISTERED: <span id="stat-users">--</span></p>
+                <p>&gt; ROOMS ACTIVE: <span id="stat-rooms">--</span></p>
+                <p>&gt; MESSAGES EXCHANGED: <span id="stat-messages">--</span></p>
+                <p>&gt; VISITS: <span id="stat-visits">------</span></p>
+            </div>
+        </div>
     </div>
     <div class="auth-box hidden" id="auth-box">
 
@@ -34,23 +50,24 @@
         </div>
 
         <!-- Error Box -->
-         <div id="error-box" class="hidden"></div>
+        <div id="error-box" class="hidden"></div>
 
-         <!-- Login Form -->
-          <div id="login-form">
+        <!-- Login Form -->
+        <div id="login-form">
             <input type="text" id="login-username" placeholder="Username" maxlength="20">
             <input type="password" id="login-password" placeholder="Password">
             <button onclick="login()">Login</button>
-          </div>
+        </div>
 
-          <!-- Register Form -->
-          <div id="register-form" class="hidden">
+        <!-- Register Form -->
+        <div id="register-form" class="hidden">
             <input type="text" id="reg-username" placeholder="Username (min 3 chars)" minlength="3" maxlength="20">
             <input type="password" id="reg-password" placeholder="Password (min 6 chars)" minlength="6">
             <input type="password" id="reg-confirm-password" placeholder="Confirm your password">
             <button onclick="register()">Create account</button>
-          </div>
+        </div>
     </div>
     <script src="auth.js"></script>
 </body>
+
 </html>
