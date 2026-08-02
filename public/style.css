@@ -161,7 +161,7 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 
 
 /* ============================================================
-   TERMINAL PANEL (ASCII banner, boot log, live stats)
+   TERMINAL PANEL
    ============================================================ */
 .terminal-panel {
   position: relative;
