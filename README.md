@@ -16,4 +16,4 @@ It's designed for people who needs real privacy online, where you can chat anony
 - SQLite
 - Vanilla HTML/CSS/JS frontend
 ##
-![Screenshot](./images/main-page.png)
+![Screenshot](main-page.png)
