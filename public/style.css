@@ -446,7 +446,17 @@ body.chat-page {
 }
 #send-btn:hover { background: var(--them); }
 #send-btn:disabled { background: var(--border-dim); color: var(--text-dim); }
-
+/* CAPTCHA
+*/
+#captcha-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+#captcha-question {
+  color: var(--them);
+  font-size: 0.9rem;
+}
 
 /* ============================================================
    MOBILE

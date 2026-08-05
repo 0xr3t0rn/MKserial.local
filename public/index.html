@@ -64,6 +64,11 @@
             <input type="text" id="reg-username" placeholder="Username (min 3 chars)" minlength="3" maxlength="20">
             <input type="password" id="reg-password" placeholder="Password (min 6 chars)" minlength="6">
             <input type="password" id="reg-confirm-password" placeholder="Confirm your password">
+            <div id="captcha-box">
+                <p>Answer the verificaton question below: </p>
+                <label id="captcha-question">Loading...</label>
+                <input type="text" id="captcha-answer" placeholder="Answer" inputmode="numeric">
+            </div>
             <button onclick="register()">Create account</button>
         </div>
     </div>

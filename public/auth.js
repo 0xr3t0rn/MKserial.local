@@ -1,3 +1,14 @@
+let captchaToken = null;
+
+// Captcha
+async function loadCaptcha() {
+    const res = await fetch('/api/captcha');
+    const data = await res.json();
+    captchaToken = data.captchaToken;
+    document.getElementById('captcha-question').textContent = data.question + " = ?";
+    document.getElementById('captcha-answer').value = "";
+}
+
 // Handles Login/Register page
 (async () => {
   try {
@@ -150,6 +161,8 @@ function showTab(tab) {
     document.getElementById('tab-login').classList.toggle('active', isLogin);
     document.getElementById('tab-register').classList.toggle('active', !isLogin);
 
+    if (!isLogin) loadCaptcha(); // NEW — fetch a fresh question every time Register opens
+
     clearError();
 }
 
@@ -197,6 +210,7 @@ async function register() {
     const username = document.getElementById('reg-username').value.trim();
     const password = document.getElementById('reg-password').value;
     const confirmPassword = document.getElementById('reg-confirm-password').value;
+    const captchaAnswer = document.getElementById('captcha-answer').value.trim();
 
     if (!username || !password) {
         return showError("Please fill in all fields");
@@ -205,11 +219,11 @@ async function register() {
     if (password !== confirmPassword) {
         return showError("Passwords not matched")
     };
-    
+
     const res = await fetch('/api/register', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username, password, captchaToken, captchaAnswer })
     });
 
     const data = await res.json();
@@ -218,6 +232,9 @@ async function register() {
         window.location.href = "/chat.html";
     } else {
         showError(data.error);
+        if (data.error?.includes("answer") || data.error?.includes("expired")) {
+            loadCaptcha(); // wrong or expired — get a new question instead of retrying the same one
+        }
     }
 }
 
