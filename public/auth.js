@@ -106,6 +106,24 @@ setInterval(nextTagline, 10000);
 
 taglineEl.addEventListener("click", nextTagline);
 
+// Live UTC clock
+function updateUTCClock() {
+  const now = new Date();
+
+  const dateStr = now.toLocaleDateString('en-US', {
+    timeZone: 'UTC', month: 'short', day: '2-digit', year: 'numeric'
+  });
+  const timeStr = now.toLocaleTimeString('en-GB', {
+    timeZone: 'UTC', hour12: false
+  });
+
+  document.getElementById('utc-date').textContent = dateStr;
+  document.getElementById('utc-time').textContent = timeStr + ' UTC';
+}
+
+updateUTCClock();
+setInterval(updateUTCClock, 1000);
+
 // Main page
 // Terminal boot log + live stats
 const bootLines = [

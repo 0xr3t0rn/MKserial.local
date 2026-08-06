@@ -1,27 +1,14 @@
 /* ============================================================
-   MKSERIAL.LOCAL — retro theme (v2)
-   ------------------------------------------------------------
+   MKSERIAL.LOCAL
    ============================================================ */
 :root {
   --bg: #000000;
-
-  --topbar: #0e3a42;        /* dark teal site nav bar */
-  --topbar-text: #e8f8fa;
-
-  --chrome-1: #eafbfd;      /* window title bar gradient — top */
-  --chrome-2: #a8e8f0;      /* window title bar gradient — bottom */
-  --chrome-text: #0a2a33;   /* dark text on the pale title bars */
-
-  --border: #56d6dd;        /* bright cyan window border */
-  --border-dim: #1a4a55;    /* subtle inner dividers */
-
-  --text: #d8f5fa;
-  --text-dim: #5f97a3;
-
-  --you: #ffa94d;           /* your own chat messages — amber */
-  --them: #5eead4;          /* everyone else's messages — mint*/
-
-  --alert: #ff5577;
+  --green: #39ff14;       /* primary neon accent - borders, headers, links */
+  --green-dim: #1f8c0d;   /* darker green for secondary elements */
+  --pink: #ff4dd8;        /* secondary accent */
+  --text: #e8ffe8;        /* main body text, faint green-white tint */
+  --text-dim: #7fbf7f;
+  --alert: #ff3355;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,60 +16,73 @@
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: "Courier New", Courier, monospace;
+  font-family: Verdana, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.5;
-  position: relative;
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background-image: radial-gradient(rgba(86, 214, 221, 0.1) 1px, transparent 1px);
-  background-size: 26px 26px;
+/* the graph-paper grid, tiled across the whole page */
+body {
+  background-image:
+    repeating-linear-gradient(0deg, rgba(57, 255, 20, 0.16) 0px, rgba(57, 255, 20, 0.16) 1px, transparent 1px, transparent 22px),
+    repeating-linear-gradient(90deg, rgba(57, 255, 20, 0.16) 0px, rgba(57, 255, 20, 0.16) 1px, transparent 1px, transparent 22px);
 }
 
 .hidden { display: none !important; }
 
-a { color: var(--them); text-decoration: underline; }
-a:visited { color: var(--you); }
+a { color: var(--green); text-decoration: underline; }
+a:visited { color: var(--pink); }
 a:hover { color: #ffffff; }
 
-::selection { background: var(--border); color: #000000; }
+::selection { background: var(--green); color: #000000; }
+
+/* utility classes for bold colored keywords */
+.hl-green { color: var(--green); font-weight: bold; }
+.hl-pink { color: var(--pink); font-weight: bold; }
 
 
 /* ============================================================
-   WINDOW TITLE BARS — auth popup, chat header, sidebar top,
-   terminal panel, passcode modal. Pale gradient, dark text,
-   small icon on the left, two little control marks on the right.
+   MARQUEE BANNER
+   ============================================================ */
+.marquee-bar {
+  overflow: hidden;
+  white-space: nowrap;
+  background: #000000;
+  border-top: 4px solid;
+  border-bottom: 4px solid;
+  border-image: repeating-linear-gradient(45deg, var(--green), var(--green) 10px, #000 10px, #000 20px) 4;
+  padding: 6px 0;
+}
+.marquee-bar span {
+  display: inline-block;
+  padding-left: 100%;
+  color: #ffffff;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  font-size: 0.8rem;
+  animation: marquee 10s linear infinite;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+
+/* ============================================================
+   SHARED: bordered box + bold green header
+   Applied to every "panel" on the site — auth popup, sidebar,
+   chat header, terminal panel
    ============================================================ */
 #auth-header,
 .sidebar-top,
 .chat-header {
-  background: linear-gradient(to bottom, var(--chrome-1), var(--chrome-2));
-  color: var(--chrome-text);
+  background: #000000;
+  color: var(--green);
+  font-weight: bold;
+  border-bottom: 3px solid var(--green);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  border-bottom: 1px solid var(--chrome-text);
-}
-#auth-header::before,
-.sidebar-top::before,
-.chat-header::before {
-  content: "■";
-  font-size: 0.65rem;
-  color: var(--topbar);
-}
-#auth-header::after,
-.sidebar-top::after,
-.chat-header::after {
-  content: "⧉ □";
-  font-size: 0.7rem;
-  letter-spacing: 0.25em;
-  opacity: 0.55;
-  margin-left: auto;
+  justify-content: space-between;
 }
 
 
@@ -91,28 +91,29 @@ a:hover { color: #ffffff; }
    ============================================================ */
 input[type="text"],
 input[type="password"] {
-  font-family: "Courier New", Courier, monospace;
+  font-family: Verdana, Arial, sans-serif;
   font-size: 14px;
   background: #000000;
-  color: var(--them);
-  border: 1px solid var(--border-dim);
+  color: var(--green);
+  border: 2px solid var(--green-dim);
   padding: 0.45rem 0.6rem;
   width: 100%;
 }
 input::placeholder { color: var(--text-dim); }
-input:focus { outline: 1px solid var(--border); }
+input:focus { outline: none; border-color: var(--pink); }
 input:disabled { opacity: .5; }
 
 button {
-  font-family: "Courier New", Courier, monospace;
-  font-size: 14px;
+  font-family: Verdana, Arial, sans-serif;
+  font-weight: bold;
+  font-size: 13px;
   background: #000000;
-  color: var(--them);
-  border: 1px solid var(--border);
+  color: var(--green);
+  border: 2px solid var(--green);
   padding: 0.45rem 0.8rem;
   cursor: pointer;
 }
-button:hover { background: var(--border); color: #000000; }
+button:hover { background: var(--green); color: #000000; }
 button:disabled { opacity: .5; cursor: not-allowed; }
 
 
@@ -123,90 +124,100 @@ button:disabled { opacity: .5; cursor: not-allowed; }
   width: 100%;
   min-height: 100vh;
   background: var(--bg);
-  position: relative;
-  overflow: hidden;
 }
 
-/* the actual top menu bar — DARK, not pale */
 .main-header {
-  position: relative;
-  z-index: 1;
-  background: var(--topbar);
-  color: var(--topbar-text);
+  background: #000000;
+  border-bottom: 4px solid var(--green);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 14px 30px;
-  border-bottom: 1px solid var(--border);
 }
 
 .logo { display: flex; flex-direction: column; }
-.logo h1 { margin: 0; line-height: 1; color: var(--topbar-text); } /* remove any inline style="color:..." left on this h1 in index.html — this rule handles it now */
-.logo p { margin: 0; margin-top: 2px; color: rgba(232, 248, 250, 0.6); font-size: 13px; }
+.logo h1 {
+  margin: 0;
+  line-height: 1;
+  color: var(--green);
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: 2rem;
+  letter-spacing: 0.03em;
+} /* remove any inline style="color:..."*/
+.logo p { margin: 0; margin-top: 2px; color: var(--pink); font-size: 13px; font-weight: bold; }
 
 #tagline { transition: opacity 0.5s ease; cursor: pointer; }
 
 .logo-mark { display: block; height: 2.2rem; width: auto; }
 
-.nav { display: flex; gap: 0; margin-left: 1.5rem; }
-.nav button {
-  background: transparent;
-  color: var(--topbar-text);
-  border: none;
-  border-left: 1px solid rgba(232, 248, 250, 0.25);
-  padding: 0.4rem 1rem;
-  font-size: 0.85rem;
-}
-.nav button:hover { background: rgba(232, 248, 250, 0.1); color: #ffffff; }
+.nav { display: flex; gap: 0.6rem; margin-left: 1.5rem; }
 
 
 /* ============================================================
    TERMINAL PANEL
    ============================================================ */
 .terminal-panel {
-  position: relative;
-  z-index: 1;
-  background: var(--bg);
-  color: var(--them);
-  padding: 2.5rem 1.5rem 1.5rem;
+  background: #000000;
+  color: var(--green);
+  padding: 1.5rem;
   margin: 2.5rem auto;
   max-width: 600px;
-  border: 1px solid var(--border);
-  box-shadow: 0 0 25px rgba(86, 214, 221, 0.15);
-}
-.terminal-panel::before {
-  content: "■ [status]";
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1.8rem;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0 1rem;
-  background: linear-gradient(to bottom, var(--chrome-1), var(--chrome-2));
-  color: var(--chrome-text);
-  font-size: 0.8rem;
-  border-bottom: 1px solid var(--chrome-text);
+  border: 3px solid var(--green);
 }
 
 .ascii-banner {
   white-space: pre;
-  font-size: 0.75rem;
+  font-family: "Courier New", monospace;
+  font-size: 0.7rem;
   line-height: 1.2;
   margin-bottom: 1rem;
   overflow-x: auto;
-  color: var(--them);
+  color: var(--green);
 }
 
 #terminal-log p,
-#terminal-stats p { margin: 0.3rem 0; color: var(--them); }
-#terminal-stats span { color: #ffffff; font-weight: bold; }
+#terminal-stats p { margin: 0.3rem 0; color: var(--green); font-family: "Courier New", monospace; }
+#terminal-stats span { color: var(--pink); font-weight: bold; }
 
 #terminal-log .cursor::after {
   content: "_";
   animation: blink 1s steps(1) infinite;
 }
 @keyframes blink { 50% { opacity: 0; } }
+
+
+/* ============================================================
+   BLINKIES ROW
+   ============================================================ */
+.blinkies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+  padding: 1.5rem;
+  background: #000000;
+  border-top: 3px solid var(--green);
+}
+.blinky {
+  width: 88px;
+  height: 31px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 9px;
+  font-weight: bold;
+  line-height: 1.15;
+  padding: 2px;
+  border: 1px solid #000000;
+  outline: 1px solid #ffffff;
+}
+.blinky.b1 { background: #000000; color: var(--green); outline-color: var(--green); }
+.blinky.b2 { background: #1a001a; color: var(--pink); outline-color: var(--pink); }
+.blinky.b3 { background: #002200; color: #ffffff; outline-color: var(--green); }
+.blinky.b4 { background: #111111; color: var(--green); outline-color: #ffffff; }
+.blinky.b5 { background: #22001a; color: var(--pink); outline-color: #ffffff; }
+.blinky.b6 { background: #000000; color: #ffffff; outline-color: var(--green); }
 
 
 /* ============================================================
@@ -219,13 +230,12 @@ button:disabled { opacity: .5; cursor: not-allowed; }
   transform: translate(-50%, -50%);
   width: min(380px, 100%);
   background: var(--bg);
-  border: 1px solid var(--border);
-  box-shadow: 0 0 30px rgba(86, 214, 221, 0.2);
+  border: 3px solid var(--green);
   z-index: 100;
 }
 
 .close-auth {
-  color: var(--chrome-text);
+  color: var(--green);
   background: transparent;
   border: none;
   width: 26px;
@@ -233,37 +243,34 @@ button:disabled { opacity: .5; cursor: not-allowed; }
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
-  order: -1; /* sits before the ■ icon and title inside the flex title bar */
 }
-.close-auth:hover { background: rgba(10, 42, 51, 0.15); }
+.close-auth:hover { color: var(--pink); }
 
 #auth-header {
   cursor: move;
   user-select: none;
-  padding: 0.5rem 0.75rem;
-  font-size: 1rem;
+  padding: 0.6rem 0.9rem;
+  font-size: 1.1rem;
+  font-family: Impact, "Arial Black", sans-serif;
+  letter-spacing: 0.03em;
 }
 
-.auth-box > p { color: var(--text-dim); padding: 0.75rem 1rem 0; }
+.auth-box > p { color: var(--pink); font-weight: bold; padding: 0.75rem 1rem 0; }
 
 .tabs { display: flex; gap: 0; padding: 0.75rem 1rem 0; }
 .tab {
   flex: 1;
   background: #000000;
   color: var(--text-dim);
-  border: 1px solid var(--border-dim);
-  border-bottom: none;
+  border: 2px solid var(--green-dim);
 }
-.tab.active {
-  background: linear-gradient(to bottom, var(--chrome-1), var(--chrome-2));
-  color: var(--chrome-text);
-  border-color: var(--border);
-}
+.tab.active { background: var(--green); color: #000000; border-color: var(--green); }
 
 #error-box {
   margin: 0.75rem 1rem 0;
-  border: 1px solid var(--alert);
+  border: 2px solid var(--alert);
   color: var(--alert);
+  font-weight: bold;
   padding: 0.5rem;
 }
 
@@ -275,43 +282,34 @@ button:disabled { opacity: .5; cursor: not-allowed; }
   padding: 0.75rem 1rem 1rem;
 }
 
+#captcha-box { display: flex; flex-direction: column; gap: 0.4rem; }
+#captcha-question { color: var(--pink); font-weight: bold; }
+
 
 /* ============================================================
-   PASSCODE MODAL (locked rooms)
+   PASSCODE + 2FA MODALS
    ============================================================ */
-#passcode-modal {
+#passcode-modal,
+#twofa-setup-modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 200;
 }
-.passcode-box {
-  position: relative;
+.passcode-box,
+.twofa-box {
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: 3px solid var(--green);
   width: min(340px, 90%);
-  padding: 2.2rem 1.25rem 1.25rem;
-  box-shadow: 0 0 25px rgba(86, 214, 221, 0.2);
+  padding: 1.25rem;
 }
-.passcode-box::before {
-  content: "■ [locked room]";
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1.8rem;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0 1rem;
-  background: linear-gradient(to bottom, var(--chrome-1), var(--chrome-2));
-  color: var(--chrome-text);
-  font-size: 0.8rem;
-  border-bottom: 1px solid var(--chrome-text);
-}
-.passcode-box p { margin-bottom: 0.75rem; color: var(--text-dim); }
-#passcode-error { color: var(--alert); font-size: 0.85rem; margin-top: 0.4rem; }
+.passcode-box p,
+.twofa-box p { margin-bottom: 0.75rem; color: var(--text-dim); }
+#passcode-error,
+#twofa-setup-error { color: var(--alert); font-weight: bold; font-size: 0.85rem; margin-top: 0.4rem; }
 .passcode-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
 .passcode-actions button { flex: 1; }
 
@@ -330,29 +328,24 @@ body.chat-page {
   width: 230px;
   flex-shrink: 0;
   background: var(--bg);
-  border-right: 1px solid var(--border);
+  border-right: 3px solid var(--green);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
 }
 
-.sidebar-top { padding: 0.5rem 0.75rem; }
-.sidebar-top span { font-weight: bold; }
-.sidebar-top button {
-  font-size: 0.75rem;
-  padding: 0.2rem 0.5rem;
-  color: var(--chrome-text);
-  border-color: var(--chrome-text);
-  background: transparent;
-}
+.sidebar-top { padding: 0.6rem 0.8rem; }
+.sidebar-top span { font-family: Impact, "Arial Black", sans-serif; letter-spacing: 0.02em; }
+.sidebar-top button { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
 
-#my-username { padding: 0.6rem 0.8rem 0; color: var(--text-dim); }
+#my-username { padding: 0.6rem 0.8rem 0; color: var(--pink); font-weight: bold; }
 
 .sidebar h4 {
-  color: var(--them);
+  color: var(--green);
   font-size: 0.8rem;
+  letter-spacing: 0.1em;
   padding: 0.8rem 0.8rem 0.3rem;
-  border-bottom: 1px solid var(--border-dim);
+  border-bottom: 2px dashed var(--green-dim);
   margin: 0 0.8rem;
 }
 
@@ -373,9 +366,9 @@ body.chat-page {
   text-overflow: ellipsis;
 }
 #room-list li:hover,
-#user-list li:hover { color: var(--them); }
+#user-list li:hover { color: var(--green); }
 #room-list li.active,
-#user-list li.active { color: var(--them); font-weight: bold; }
+#user-list li.active { color: var(--green); font-weight: bold; }
 #room-list li.unread,
 #user-list li.unread { color: var(--alert); font-weight: bold; }
 
@@ -386,8 +379,8 @@ body.chat-page {
   min-width: 0;
 }
 
-.chat-header { padding: 0.5rem 0.75rem; }
-#chat-title { font-weight: bold; }
+.chat-header { padding: 0.6rem 1rem; }
+#chat-title { font-family: Impact, "Arial Black", sans-serif; letter-spacing: 0.02em; }
 
 #messages {
   flex: 1;
@@ -396,66 +389,78 @@ body.chat-page {
   background: var(--bg);
 }
 
-/* actual classes built by chat.js's appendMessage() —
-   .own requires the one-line JS addition from earlier:
-   if (username === myUsername) div.classList.add('own'); */
+/* actual classes built by chat.js's appendMessage() — .own
+   requires: if (username === myUsername) div.classList.add('own'); */
 .message { padding: 0.4rem 0; }
 .msg-user {
   font-weight: bold;
-  color: var(--them);       /* everyone else: mint green */
+  color: var(--green);      /* everyone else */
   margin-right: 0.5rem;
 }
 .message.own .msg-user {
-  color: var(--you);        /* you: amber, like [user] */
+  color: var(--pink);       /* you */
 }
 .msg-time {
   font-size: 0.7rem;
-  opacity: 0.6;
+  opacity: 0.7;
   color: var(--text-dim);
 }
-.msg-text {
-  color: var(--text);
-  margin-top: 0.15rem;
-  padding-left: 0.9rem;
-  position: relative;
-}
-.msg-text::before {
-  content: "▸";
-  position: absolute;
-  left: 0;
-  color: var(--border-dim);
-  font-size: 0.75rem;
-}
+.msg-text { color: var(--text); margin-top: 0.15rem; }
 
 .input-row {
   display: flex;
   gap: 0.5rem;
-  border-top: 1px solid var(--border);
+  border-top: 3px solid var(--green);
   padding: 0.6rem 1rem;
   background: var(--bg);
 }
 #msg-input { flex: 1; }
 
-/* the send button stands out as a solid accent, matching the
-   filled cyan "送信" button in the reference */
 #send-btn {
-  background: var(--border);
+  background: var(--green);
   color: #000000;
-  font-weight: bold;
-  border-color: var(--border);
 }
-#send-btn:hover { background: var(--them); }
-#send-btn:disabled { background: var(--border-dim); color: var(--text-dim); }
-/* CAPTCHA
+#send-btn:hover { background: var(--pink); color: #000000; }
+#send-btn:disabled { background: var(--green-dim); color: #000000; }
+
+/*
+   Date and time
 */
-#captcha-box {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+.clock-display {
+  font-family: "Courier New", monospace;
+  font-size: 1.4rem;
+  letter-spacing: 0.05em;
+  color: var(--green);
+  margin-top: 0.3rem;
 }
-#captcha-question {
-  color: var(--them);
-  font-size: 0.9rem;
+
+.header-gif {
+  height: 4rem;
+  width: auto;
+}
+
+.logo { flex-direction: row; align-items: center; gap: 0; }
+.logo-text { display: flex; flex-direction: column; }
+
+.main-page {
+  position: relative;
+  overflow: hidden;
+}
+
+.main-page::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 400px;                          /* how much horizontal space it takes up */
+  background-image: url('rei.png');
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: contain;
+  opacity: 0.15;
+  z-index: 0;
+  pointer-events: none;
 }
 
 /* ============================================================
@@ -467,9 +472,11 @@ body.chat-page {
     width: 100%;
     max-height: 35vh;
     border-right: none;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 3px solid var(--green);
   }
-  .main-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-  .main-page::before,
-  .main-page::after { display: none; }
+.main-header,
+.terminal-panel,
+.blinkies {
+  position: relative;
+  z-index: 1;
 }
