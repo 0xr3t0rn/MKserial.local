@@ -178,6 +178,8 @@ router.post('/rooms/:roomId/unlock', requireLogin, async (req, res) => {
 // NOTE: intentionally has no requireLogin — this needs to work
 // before someone's logged in, on the main page itself.
 router.get('/stats', (req, res) => {
+    resetVisitsIfNewDay();
+
     const users = db.prepare('SELECT COUNT(*) AS c FROM users').get().c;
     const rooms = db.prepare('SELECT COUNT(*) AS c FROM rooms').get().c;
     const roomMsgs = db.prepare('SELECT COUNT(*) AS c FROM messages').get().c;
@@ -194,9 +196,27 @@ router.get('/stats', (req, res) => {
 
 // POST /api/visit — bumps the visit counter by 1, called once per page load
 router.post('/visit', (req, res) => {
+    resetVisitsIfNewDay();
+
     db.prepare("UPDATE site_stats SET value = value + 1 WHERE key = 'visits'").run();
     const visits = db.prepare("SELECT value FROM site_stats WHERE key = 'visits'").get().value;
     res.json({ visits });
 });
 
+// resets the visit counter once a new UTC day starts
+function resetVisitsIfNewDay() {
+    const currentDay = Math.floor(Date.now() / 86400000); // days since epoch, UTC-based
+    const row = db.prepare("SELECT value FROM site_stats WHERE key = 'last_reset_day'").get();
+
+    if (!row) {
+        // first time this has ever run — just record today, nothing to reset yet
+        db.prepare("INSERT INTO site_stats (key, value) VALUES ('last_reset_day', ?)").run(currentDay);
+        return;
+    }
+
+    if (row.value !== currentDay) {
+        db.prepare("UPDATE site_stats SET value = 0 WHERE key = 'visits'").run();
+        db.prepare("UPDATE site_stats SET value = ? WHERE key = 'last_reset_day'").run(currentDay);
+    }
+}
 module.exports = router;

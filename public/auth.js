@@ -82,7 +82,8 @@ const taglines = [
   "F*CK SOCIETY.",
   "Stay hidden.",
   "Down with Big Brother!",
-  "The first rule of Fight Club is: you do not talk about Fight Club."
+  "The first rule of Fight Club is: you do not talk about Fight Club.",
+  "Just because you can does not mean you should."
 ];
 
 const taglineEl = document.getElementById("tagline");
