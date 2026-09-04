@@ -32,7 +32,7 @@ const authLimiter = rateLimit({
 // Helper function to create token and set it as cookie
 function issueToken(res, user) {
     const token = jwt.sign(
-        { id: user.id, username: user.username },
+        { id: user.id, username: user.username, timezone: user.timezone || 'UTC' },
         SECRET,
         { expiresIn: "7d" }
     );
@@ -46,7 +46,7 @@ function issueToken(res, user) {
 
 // POST /api/register
 router.post('/register', authLimiter, async (req, res) => {
-    const { username, password, captchaToken, captchaAnswer } = req.body;
+    const { username, password, captchaToken, captchaAnswer, timezone } = req.body;
 
     if (!username || !password) {
         return res.status(400).json({ error: "Username and password are required" });
@@ -63,6 +63,10 @@ router.post('/register', authLimiter, async (req, res) => {
     } catch {
         return res.status(400).json({ error: "Verification expired, please try again" });
     };
+    let validTimezone = 'UTC';
+    if (timezone && Intl.supportedValuesOf('timeZone').includes(timezone)) {
+        validTimezone = timezone;
+    }
     if (username.length < 3) {
         return res.status(400).json({ error: "Username length must greater than 3" });
     };
@@ -81,11 +85,11 @@ router.post('/register', authLimiter, async (req, res) => {
 
     try {
         result = db
-            .prepare('INSERT INTO users (username, password) VALUES (?, ?)')
-            .run(username, hash);
+            .prepare('INSERT INTO users (username, password, timezone) VALUES (?, ?, ?)')
+            .run(username, hash, validTimezone);
 
         // result.lastInsertRowId is the auto-assigned id of the new user
-        issueToken(res, { id: result.lastInsertRowId, username });
+        issueToken(res, { id: result.lastInsertRowId, username, timezone: validTimezone });
         res.json({ success: true, username });
     } catch (err) {
         if (err.message.includes("UNIQUE")) {
@@ -147,7 +151,7 @@ router.get('/me', (req, res) => {
 
     try {
         const payload = jwt.verify(token, SECRET);
-        res.json({ id: payload.id, username: payload.username });
+        res.json({ id: payload.id, username: payload.username, timezone: payload.timezone || 'UTC' });
     } catch {
         res.status(401).json({ error: "Session expired, please log in again" });
     }

@@ -9,6 +9,65 @@ async function loadCaptcha() {
     document.getElementById('captcha-answer').value = "";
 }
 
+// Timezone dropdown
+function buildTimezoneList() {
+    const now = new Date();
+    const zones = Intl.supportedValuesOf('timeZone');
+
+    const list = zones.map(zone => {
+        const dtf = new Intl.DateTimeFormat('en-US', {
+            timeZone: zone, hour12: false,
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+        const parts = {};
+        dtf.formatToParts(now).forEach(p => { parts[p.type] = p.value; });
+        const asUTC = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour === '24' ? 0 : parts.hour, parts.minute, parts.second);
+        const offsetMinutes = Math.round((asUTC - now.getTime()) / 60000);
+
+        let name = zone;
+        try {
+            const nameParts = new Intl.DateTimeFormat('en-US', { timeZone: zone, timeZoneName: 'long' }).formatToParts(now);
+            name = nameParts.find(p => p.type === 'timeZoneName')?.value || zone;
+        } catch (_) {}
+
+        const sign = offsetMinutes >= 0 ? '+' : '-';
+        const abs = Math.abs(offsetMinutes);
+        const hh = Math.floor(abs / 60);
+        const mm = abs % 60;
+        const offsetLabel = mm === 0 ? `${sign}${hh}` : `${sign}${hh}:${String(mm).padStart(2, '0')}`;
+
+        return { zone, name, offsetMinutes, label: `[UTC ${offsetLabel}] ${name}` };
+    });
+
+    const seen = new Set();
+    const deduped = list.filter(item => {
+        if (seen.has(item.label)) return false;
+        seen.add(item.label);
+        return true;
+    });
+
+    deduped.sort((a, b) => a.offsetMinutes - b.offsetMinutes);
+    return deduped;
+}
+
+function populateTimezones() {
+    const select = document.getElementById('reg-timezone');
+    const list = buildTimezoneList();
+    const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    select.innerHTML = "";
+    list.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.zone;
+        opt.textContent = item.label;
+        if (item.zone === detected) opt.selected = true;
+        select.appendChild(opt);
+    });
+}
+
+populateTimezones();
+
 // Handles Login/Register page
 (async () => {
   try {
@@ -230,6 +289,7 @@ async function register() {
     const password = document.getElementById('reg-password').value;
     const confirmPassword = document.getElementById('reg-confirm-password').value;
     const captchaAnswer = document.getElementById('captcha-answer').value.trim();
+    const timezone = document.getElementById('reg-timezone').value;
 
     if (!username || !password) {
         return showError("Please fill in all fields");
@@ -242,7 +302,7 @@ async function register() {
     const res = await fetch('/api/register', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password, captchaToken, captchaAnswer })
+        body: JSON.stringify({ username, password, captchaToken, captchaAnswer, timezone })
     });
 
     const data = await res.json();

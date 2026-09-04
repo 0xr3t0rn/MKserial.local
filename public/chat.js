@@ -3,6 +3,7 @@ let myUsername = null;
 let currentRoom = null;
 let currentDM = null;
 let socket = null;
+let myTimezone = 'UTC';
 let currentRoomToken = null;
 let pendingRoom = null;
 window.roomsById = {};
@@ -18,6 +19,7 @@ async function init() {
     };
     // Store username and show it
     myUsername = data.username;
+    myTimezone = data.timezone || 'UTC';
     document.getElementById('my-username').textContent = "Logged in as " + myUsername;
 
     // Connect to socket.io
@@ -190,13 +192,14 @@ function appendMessage(username, content, time) {
     const box = document.getElementById('messages');
     const div = document.createElement('div');
     div.classList.add('message');
+    if (username === myUsername) div.classList.add('own');
 
     // Time
     const safeTime = time.includes('Z') ? time : time + 'Z';
     const dateObj = new Date(safeTime);
-    const datePart = dateObj.toLocaleDateString([], { month: "short", day: "numeric" }); // e.g. "Jul 27"
-    const timePart = dateObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); // e.g. "21:04"
-    const timeStr = `${datePart}, ${timePart}`; // e.g. "Jul 27, 21:04"
+    const datePart = dateObj.toLocaleDateString([], { month: "short", day: "numeric", timeZone: myTimezone });
+    const timePart = dateObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", timeZone: myTimezone });
+    const timeStr = `${datePart}, ${timePart}`;
 
     div.innerHTML = `
         <div>
