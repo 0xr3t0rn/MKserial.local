@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const db = require('./db/database');
 const authRouter = require('./routes/auth');
 const chatRouter = require('./routes/chat');
+const { validateMessage } = require('./utils/validate');
 
 const helmet = require('helmet');
 const app = express();
@@ -23,6 +24,17 @@ app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
 app.use(express.static('public'));
 app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    useDefaults: true,
+    directives: {
+      "script-src": ["'self'"],
+      "object-src": ["'none'"],
+      "img-src": ["'self'", "data:"],
+    },
+  })
+);
+
 
 // Http Routes
 app.use('/api', authRouter);
@@ -79,7 +91,8 @@ io.on('connection', (socket) => {
 
   // Event: client sends a room message
   socket.on('send_message', ({ roomId, content, roomToken }) => {
-    if (!content?.trim() || !roomId) return;
+    const text = validateMessage(content);
+    if (!text || !roomId) return;
     roomId = Number(roomId);
 
     // NEW: re-check the lock here too — without this, someone could
@@ -96,8 +109,6 @@ io.on('connection', (socket) => {
             return;
         }
     }
-
-    const text = content.trim().slice(0, 2000);
 
     // Save to database (permanent)
     const result = db.prepare(
@@ -129,9 +140,9 @@ io.on('connection', (socket) => {
 
   // Event: client sends a DM
   socket.on("send_dm", ({ otherUsername, content }) => {
-    if (!content?.trim() || !otherUsername) return;
+    const text = validateMessage(content);
+    if (!text || !otherUsername) return;
 
-    const text = content.trim().slice(0, 2000);
     const key  = [socket.user.username, otherUsername].sort().join("|");
 
     // Save to database

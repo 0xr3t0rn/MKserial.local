@@ -5,12 +5,28 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 const db = require('../db/database');
+const { validateRoomName } = require('../utils/validate');
 
 const router = express.Router();
 const SECRET = process.env.JWT_SECRET;
 
 const bcrypt = require('bcrypt');
 const { ipKeyGenerator } = rateLimit;
+
+// --- limiters ---
+const dmLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  keyGenerator: (req) => req.user?.id || req.ip,
+  message: { error: "Too many direct messages, slow down" }
+});
+
+const unlockLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  keyGenerator: (req) => req.user?.id || req.ip,
+  message: { error: "Too many unlock attempts, please wait" }
+});
 
 function requireLogin(req, res, next) {
     const token = req.cookies.token;
@@ -55,7 +71,8 @@ router.get('/rooms', requireLogin, (req, res) => {
 
 // POST /api/rooms
 router.post('/rooms', requireLogin, createRoomLimiter, async (req, res) => {
-    let name = req.body.name?.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+    // let name = req.body.name?.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+    let name = validateRoomName(req.body.name);
     const { passcode, hint } = req.body; // NEW
 
     if(!name || name.length < 2) {
@@ -129,7 +146,7 @@ router.get('/users', requireLogin, (req, res) => {
 
 // GET /api/dm/:otherUsername/messages
 // DM history between two users
-router.get('/dm/:otherUsername/messages', requireLogin, (req, res) => {
+router.get('/dm/:otherUsername/messages', requireLogin, dmLimiter, (req, res) => {
     const key = [req.user.username, req.params.otherUsername].sort().join('|');
 
     const messages = db.prepare(`
@@ -145,7 +162,7 @@ router.get('/dm/:otherUsername/messages', requireLogin, (req, res) => {
 // POST /api/rooms/:roomId/unlock
 // Checks a passcode and, if correct, issues a short-lived token
 // proving this user unlocked this specific room.
-router.post('/rooms/:roomId/unlock', requireLogin, async (req, res) => {
+router.post('/rooms/:roomId/unlock', requireLogin, unlockLimiter, async (req, res) => {
     const roomId = Number(req.params.roomId);
     const { passcode } = req.body;
 
